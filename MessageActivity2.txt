@@ -1,0 +1,90 @@
+package com.cab.driver
+
+import android.annotation.SuppressLint
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import butterknife.BindView
+import butterknife.OnClick
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import java.util.Date
+
+class MessageActivity2 : AppCompatActivity() {
+
+
+    @SuppressLint("MissingInflatedId")
+
+    lateinit var txt:TextView
+
+    var list:ArrayList<String> = ArrayList()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_message2)
+
+        txt = findViewById(R.id.txt)
+
+        firebasedata()
+    }
+    fun firebasedata() {
+        var databaseref: DatabaseReference
+
+        databaseref = FirebaseDatabase.getInstance().getReference().child("live").child("userchatdinkar")
+
+        databaseref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                var senderroom = "187"+","+"109"
+
+                if (!snapshot.exists()){
+                    Toast.makeText(this@MessageActivity2,"Data not exist", Toast.LENGTH_SHORT).show()
+
+                }else{
+
+                    for (snapshot1 in snapshot.getChildren()){
+
+//                        var chat = snapshot1.getValue(MessageModel::class.java)
+//                        if (chat != null) {
+////                          txt.setText(chat.toString())
+//
+//                        }
+
+                        if (snapshot1?.key?.startsWith("187")!!){
+
+                            var fullkey = snapshot1.key.toString()
+
+                            var aftersplit = fullkey.split(",")
+                            list.add(aftersplit.get(1).toString())
+
+//                            list.add(snapshot1.key.toString())
+
+                            Toast.makeText(this@MessageActivity2,"Data Present", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(this@MessageActivity2,"Data is not Present", Toast.LENGTH_SHORT).show()
+
+                        }
+
+
+                    }
+
+                    Toast.makeText(this@MessageActivity2,"list "+list.toString(), Toast.LENGTH_SHORT).show()
+                    Log.e("dinkar",list.toString())
+
+
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@MessageActivity2,"Cancelled " + error.toString(), Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
+}
+
